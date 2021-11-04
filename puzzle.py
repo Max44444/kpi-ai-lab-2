@@ -68,8 +68,7 @@ class Puzzle:
 
     def shuffle(self):
         puzzle = self
-        for _ in range(35
-                       ):
+        for _ in range(25):
             tmp = random.choice(puzzle.actions)()
             if tmp:
                 puzzle = tmp

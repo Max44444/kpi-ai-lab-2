@@ -2,28 +2,29 @@ from puzzle import Puzzle
 from node import Node
 
 
-def dls(start: Puzzle, goal: Puzzle, depth: int) -> (list[str], int):
-    depth_limit: int = depth
-    nodes: list[Node] = [Node(start, None, None, 0)]
-    count: int = 0
-    explored: list[Puzzle] = []
-
-    while nodes:
-        node: Node = nodes.pop(0)
-        count += 1
-        explored.append(node.get_puzzle())
-
+def dls(node: Node, goal: Puzzle, depth: int) -> (Node, bool, int):
+    if node.depth == depth:
         if node.get_puzzle() == goal:
-            return node.path_from_start(), count
+            return node, True, 1
+        else:
+            return None, True, 1
 
-        if node.depth < depth_limit:
-            for item in node.expand():
-                if item.get_puzzle() not in explored:
-                    nodes.insert(0, item)
+    elif depth > node.depth:
+        any_flag: bool = False
+        count: int = 0
+        for child in node.expand():
+            found, flag, new_count = dls(child, goal, depth)
+            count += 1 + new_count
+            if found is not None:
+                return found, True, count
+            any_flag = flag
+        return None, any_flag, count
 
 
 def ids(start: Puzzle, goal: Puzzle, depth: int = 50) -> (list[str], int):
     for i in range(depth):
-        result = dls(start, goal, i)
-        if result is not None:
-            return result
+        found, flag, count = dls(Node(start, None, None, 0), goal, i)
+        if found is not None:
+            return found.path_from_start(), count
+        elif not flag:
+            return None, count
